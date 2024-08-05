@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dados Recebidos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f0f0;
+        }
+        .container {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 100%;
+            max-width: 1200px;
+            text-align: left;
+            overflow-x: auto;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .delete-button {
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .delete-button:hover {
+            background-color: #ff1a1a;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Dados Recebidos</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Turno</th>
+                    <th>Fundo</th>
+                    <th>Vendas</th>
+                    <th>Total 01</th>
+                    <th>Cédula</th>
+                    <th>Moedas</th>
+                    <th>Cartão</th>
+                    <th>Pix</th>
+                    <th>Sangria</th>
+                    <th>Rota</th>
+                    <th>Canceladas</th>
+                    <th>Gasolina</th>
+                    <th>Depósito</th>
+                    <th>Loja</th>
+                    <th>Vale</th>
+                    <th>Diárias</th>
+                    <th>Total 02</th>
+                    <th>Diferença</th>
+                    <th>Data</th>
+                    <th>Ação</th>
+                </tr>
+            </thead>
+            <tbody id="dadosTableBody">
+                <!-- Dados serão inseridos aqui -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function exibirDados() {
+            fetch('http://localhost:3000/dados')
+            .then(response => response.json())
+            .then(dados => {
+                const dadosTableBody = document.getElementById('dadosTableBody');
+                dadosTableBody.innerHTML = '';
+                dados.forEach((dado, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${dado.nome}</td>
+                        <td>${dado.turno}</td>
+                        <td>${dado.fundo.toFixed(2)}</td>
+                        <td>${dado.vendas.toFixed(2)}</td>
+                        <td>${dado.total01.toFixed(2)}</td>
+                        <td>${dado.cedula.toFixed(2)}</td>
+                        <td>${dado.moedas.toFixed(2)}</td>
+                        <td>${dado.cartao.toFixed(2)}</td>
+                        <td>${dado.pix.toFixed(2)}</td>
+                        <td>${dado.sangria.toFixed(2)}</td>
+                        <td>${dado.rota.toFixed(2)}</td>
+                        <td>${dado.canceladas.toFixed(2)}</td>
+                        <td>${dado.gasolina.toFixed(2)}</td>
+                        <td>${dado.deposito.toFixed(2)}</td>
+                        <td>${dado.loja.toFixed(2)}</td>
+                        <td>${dado.vale.toFixed(2)}</td>
+                        <td>${dado.diarias.toFixed(2)}</td>
+                        <td>${dado.total02.toFixed(2)}</td>
+                        <td>${dado.diferenca.toFixed(2)}</td>
+                        <td>${dado.data}</td>
+                        <td><button class="delete-button" onclick="deletarDados(${index})">Deletar</button></td>
+                    `;
+                    dadosTableBody.appendChild(row);
+                });
+            })
+            .catch(error => {
+                console.error('Erro ao buscar dados:', error);
+            });
+        }
+
+        function deletarDados(id) {
+            fetch(`http://192.168.7.111/dados/${id}`, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (response.ok) {
+                    exibirDados();
+                } else {
+                    alert('Erro ao deletar dados');
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Erro ao deletar dados');
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', exibirDados);
+    </script>
+</body>
+</html>

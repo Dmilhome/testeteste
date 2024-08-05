@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fechamento de Caixa</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f0f0;
+        }
+        .container {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 100%;
+            max-width: 400px;
+            text-align: left;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0 15px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            font-weight: bold;
+            font-size: 18px;
+            text-align: center;
+        }
+        h1, h2, label {
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        h2 {
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .success-message {
+            color: green;
+            text-align: center;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Fechamento de Caixa</h1>
+        <label for="fundo">Fundo:</label>
+        <input type="text" id="fundo" placeholder="Valor do fundo de caixa" oninput="atualizarTotais()" onkeypress="return isNumberKey(event)">
+        
+        <label for="vendas">Vendas:</label>
+        <input type="text" id="vendas" placeholder="Valor das vendas" oninput="atualizarTotais()" onkeypress="return isNumberKey(event)">
+    
+        <div class="result" id="total01"></div>
+    
+        <h2>Variáveis:</h2>
+    
+        <label for="cedula">Cédula:</label>
+        <input type="text" id="cedula" placeholder="Valor em cédulas" oninput="atualizarTotais()" onkeypress="return isNumberKey(event)">
+    
+        <label for="moedas">Moedas:</label>
+        <input type="text" id="moedas" placeholder="Valor em moedas" oninput="atualizarTotais()" onkeypress="return isNumberKey(event)">
+    
+        <label for="cartao">Cartão:</label>
+        <input type="text" id="cartao" placeholder="Valor em cartão" oninput="atualizarTotais()" onkeypress="return isNumberKey(event)">
+    
+        <label for="pix">Pix:</label>
+        <input type="text" id="pix" placeholder="Valor em Pix" oninput="atualizarTotais()" onkeypress="return isNumberKey(event)">
+    
+        <label for="sangria">Sangria:</label>
+        <input type="text" id="sangria" placeholder="Valor de sangria" oninput="atualizarTotais()" onkeypress="return isNumberKey(event)">
+    
+        <label for="rota">Rota:</label>
+        <input type="text" id="rota" placeholder="Valor de rota" oninput="atualizarTotais()" onkeypress="return isNumberKey(event)">
+    
+        <label for="canceladas">Canceladas:</label>
+        <input type="text" id="canceladas" placeholder="Valor de vendas canceladas" oninput="atualizarTotais()" onkeypress="return isNumberKey(event)">
+    
+        <label for="gasolina">Gasolina:</label>
+        <input type="text" id="gasolina" placeholder="Valor de gasolina" oninput="atualizarTotais()" onkeypress="return isNumberKey(event)">
+    
+        <label for="deposito">Depósito:</label>
+        <input type="text" id="deposito" placeholder="Valor de depósito" oninput="atualizarTotais()" onkeypress="return isNumberKey(event)">
+    
+        <label for="loja">Loja:</label>
+        <input type="text" id="loja" placeholder="Valor de loja" oninput="atualizarTotais()" onkeypress="return isNumberKey(event)">
+    
+        <label for="vale">Vale:</label>
+        <input type="text" id="vale" placeholder="Valor de vale" oninput="atualizarTotais()" onkeypress="return isNumberKey(event)">
+    
+        <label for="diarias">Diárias:</label>
+        <input type="text" id="diarias" placeholder="Valor de diárias" oninput="atualizarTotais()" onkeypress="return isNumberKey(event)">
+    
+        <div class="result" id="total02"></div>
+    
+        <button onclick="calcularDiferenca()">Calcular</button>
+    
+        <div class="result" id="resultado"></div>
+
+        <button onclick="abrirFormularioEnvio()">Enviar</button>
+
+        <div id="formularioEnvio" style="display: none;">
+            <label for="nome">Nome:</label>
+            <input type="text" id="nome" placeholder="Digite seu nome">
+            
+            <label for="turno">Turno:</label>
+            <select id="turno">
+                <option value="manhã">Manhã</option>
+                <option value="tarde">Tarde</option>
+            </select>
+            
+            <button onclick="enviarDados()">Confirmar Envio</button>
+            <div id="successMessage" class="success-message" style="display: none;">Dados enviados com sucesso!</div>
+        </div>
+    </div>
+
+    <script>
+        function isNumberKey(evt) {
+            var charCode = (evt.which) ? evt.which : evt.keyCode;
+            if (charCode > 31 && (charCode < 48 || charCode > 57) && charCode !== 44 && charCode !== 46) {
+                return false;
+            }
+            return true;
+        }
+
+        function parseInputValue(value) {
+            return parseFloat(value.replace(',', '.')) || 0;
+        }
+
+        function atualizarTotais() {
+            const fundo = parseInputValue(document.getElementById('fundo').value);
+            const vendas = parseInputValue(document.getElementById('vendas').value);
+            const total01 = fundo + vendas;
+            document.getElementById('total01').innerHTML = `R$ ${total01.toFixed(2)}`;
+
+            const cedula = parseInputValue(document.getElementById('cedula').value);
+            const moedas = parseInputValue(document.getElementById('moedas').value);
+            const cartao = parseInputValue(document.getElementById('cartao').value);
+            const pix = parseInputValue(document.getElementById('pix').value);
+            const sangria = parseInputValue(document.getElementById('sangria').value);
+            const rota = parseInputValue(document.getElementById('rota').value);
+            const canceladas = parseInputValue(document.getElementById('canceladas').value);
+            const gasolina = parseInputValue(document.getElementById('gasolina').value);
+            const deposito = parseInputValue(document.getElementById('deposito').value);
+            const loja = parseInputValue(document.getElementById('loja').value);
+            const vale = parseInputValue(document.getElementById('vale').value);
+            const diarias = parseInputValue(document.getElementById('diarias').value);
+
+            const total02 = cedula + moedas + cartao + pix + sangria + rota + canceladas + gasolina + deposito + loja + vale + diarias;
+            document.getElementById('total02').innerHTML = `R$ ${total02.toFixed(2)}`;
+        }
+
+        function calcularDiferenca() {
+            const total01 = parseFloat(document.getElementById('total01').innerText.replace('R$ ', '').replace(',', '.')) || 0;
+            const total02 = parseFloat(document.getElementById('total02').innerText.replace('R$ ', '').replace(',', '.')) || 0;
+
+            const diferenca = total02 - total01;
+            const resultadoDiv = document.getElementById('resultado');
+
+            if (diferenca < 0) {
+                resultadoDiv.innerHTML = `Faltou R$ ${Math.abs(diferenca).toFixed(2)}`;
+                resultadoDiv.style.color = 'red';
+            } else {
+                resultadoDiv.innerHTML = `Sobrou R$ ${diferenca.toFixed(2)}`;
+                resultadoDiv.style.color = 'green';
+            }
+        }
+
+        function abrirFormularioEnvio() {
+            document.getElementById('formularioEnvio').style.display = 'block';
+        }
+
+        function enviarDados() {
+            const nome = document.getElementById('nome').value;
+            const turno = document.getElementById('turno').value;
+            const fundo = parseInputValue(document.getElementById('fundo').value);
+            const vendas = parseInputValue(document.getElementById('vendas').value);
+            const total01 = fundo + vendas;
+            const cedula = parseInputValue(document.getElementById('cedula').value);
+            const moedas = parseInputValue(document.getElementById('moedas').value);
+            const cartao = parseInputValue(document.getElementById('cartao').value);
+            const pix = parseInputValue(document.getElementById('pix').value);
+            const sangria = parseInputValue(document.getElementById('sangria').value);
+            const rota = parseInputValue(document.getElementById('rota').value);
+            const canceladas = parseInputValue(document.getElementById('canceladas').value);
+            const gasolina = parseInputValue(document.getElementById('gasolina').value);
+            const deposito = parseInputValue(document.getElementById('deposito').value);
+            const loja = parseInputValue(document.getElementById('loja').value);
+            const vale = parseInputValue(document.getElementById('vale').value);
+            const diarias = parseInputValue(document.getElementById('diarias').value);
+            const total02 = cedula + moedas + cartao + pix + sangria + rota + canceladas + gasolina + deposito + loja + vale + diarias;
+            const diferenca = total02 - total01;
+
+            const dados = {
+                nome,
+                turno,
+                fundo,
+                vendas,
+                total01,
+                cedula,
+                moedas,
+                cartao,
+                pix,
+                sangria,
+                rota,
+                canceladas,
+                gasolina,
+                deposito,
+                loja,
+                vale,
+                diarias,
+                total02,
+                diferenca,
+                data: new Date().toLocaleString()
+            };
+
+            fetch('http://192.168.7.111/enviar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(dados)
+            })
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById('successMessage').style.display = 'block';
+                    setTimeout(() => {
+                        document.getElementById('successMessage').style.display = 'none';
+                    }, 3000);
+                } else {
+                    alert('Erro ao enviar dados');
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Erro ao enviar dados');
+            });
+        }
+    </script>
+</body>
+</html>
